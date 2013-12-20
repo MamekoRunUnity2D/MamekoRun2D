@@ -1,3 +1,4 @@
+Temp/
 Library/
 Assembly-CSharp.csproj
 Assembly-CSharp-vs.csproj
@@ -7,3 +8,8 @@ Assembly-UnityScript.unityproj
 Assembly-UnityScript-vs.unityproj
 Assembly-UnityScript-firstpass.unityproj
 Assembly-UnityScript-firstpass-vs.unityproj
+
+MamekoRun2D-csharp.sln
+MamekoRun2D.apk
+MamekoRun2D.userprefs
+MamekoRun2D.sln

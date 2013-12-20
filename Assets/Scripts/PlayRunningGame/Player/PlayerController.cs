@@ -4,21 +4,19 @@ using System.Collections;
 public class PlayerController : MonoBehaviour {
 
 	#region public members.
-	public float		SpeedRight	= 0.1f;			// The fastest the player can travel in the x axis.
+	public float		SpeedRight;			// The fastest the player can travel in the x axis.
 	public float		JumpForce;
 	public AudioClip[]	JumpClips;					// Array of clips for when the player jumps.
 	public AudioClip	DieClips;					// Array of clips for when the player jumps.
-
-	public bool		isDead			= false;
+	public bool			IsController	= false;
+	public bool			IsDead			= false;
+	public bool			IsJumpEnabaled	= false;
 	#endregion
 
 	#region private members.
-	private float		_MovingDistanceLocalPosition;
-	private float		_MovingDistanceMeter;
-	private Transform	_groundCheck;				// A position marking where to check if the player is grounded.
+	private Transform	groundCheck;				// A position marking where to check if the player is grounded.
 
-	private bool		_isGrounded		= false;
-	private bool		_isJumpEnabaled	= false;
+	private bool		isGrounded		= false;
 
 	private enum PlayerJumpStatus {
 		Normal	= 0,
@@ -31,8 +29,11 @@ public class PlayerController : MonoBehaviour {
 	/// Awake this instance.
 	/// </summary>
 	void Awake( ) {
+		// デフォルトスピード.
+		SpeedRight	= Player.PlayerConfig.DefaultSpeedRight;
+
 		// Setting up references.
-		_groundCheck = transform.Find("groundCheck");
+		groundCheck = transform.Find("groundCheck");
 	}
 
 	/// <summary>
@@ -40,14 +41,16 @@ public class PlayerController : MonoBehaviour {
 	/// </summary>
 	void Update () {
 
-		// 地上にいるか判定.
-		_isGrounded = Physics2D.Linecast( transform.position, _groundCheck.position, 1 << LayerMask.NameToLayer("Ground") );
+		// 操作可能.
+		if ( true == IsController ) {
+			// 地上にいるか判定.
+			isGrounded = Physics2D.Linecast( transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground") );
+		}
 
 #if UNITY_EDITOR
-		if ( Input.GetMouseButton(0) && _isGrounded ) {
-			_isJumpEnabaled	= true;
+		if ( Input.GetMouseButtonDown(0) && isGrounded ) {
+			IsJumpEnabaled	= true;
 		}
-		
 #else
 		if ( Input.touchCount > 0 ) {
 			
@@ -57,8 +60,8 @@ public class PlayerController : MonoBehaviour {
 				if ( 
 				    Input.GetTouch(0).phase == TouchPhase.Began
 				    ) {
-					if ( _isGrounded ) {
-						_isJumpEnabaled	= true;
+					if ( isGrounded ) {
+						IsJumpEnabaled	= true;
 					}
 				}
 			}
@@ -72,7 +75,7 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate ( ) {
 
 		// プレイ不可状態.
-		if ( isDead ) {
+		if ( IsDead ) {
 			AudioSource.PlayClipAtPoint( DieClips, transform.position );
 			Destroy ( this.gameObject );
 		}
@@ -82,14 +85,14 @@ public class PlayerController : MonoBehaviour {
 			transform.Translate( new Vector2( SpeedRight, 0.0f ) );
 
 			// ジャンプ可能な場合.
-			if ( _isJumpEnabaled  ) {
+			if ( IsJumpEnabaled  ) {
 
 				// プレイヤージャンプ処理.
 				Jump( JumpForce );
 
 				//  ジャンプSE再生.
 				AudioSource.PlayClipAtPoint( JumpClips[ (int)PlayerJumpStatus.Normal ], transform.position );
-				_isJumpEnabaled	= false;
+				IsJumpEnabaled	= false;
 			}
 		}
 	}

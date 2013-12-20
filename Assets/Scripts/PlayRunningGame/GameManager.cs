@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour {
 
 			if ( _playerController != null ) {
 				// プレイヤーが死.
-				if( _playerController.isDead ) {
+				if( _playerController.IsDead ) {
 					setPlayerDie( );
 				}
 			}
@@ -64,15 +64,24 @@ public class GameManager : MonoBehaviour {
 				_uiLabelDistanceScore.text	= (string)System.Convert.ToString( Mathf.Floor( _playerPosition.x / 2 ) );
 			}
 
-			// 追跡するプレイヤーのX軸ポジション  が一定位置まで来た場合に追従開始.
-			if ( false == _isCameraEnableChasePlayer && ChaserCamera.transform.position.x <= _playerPosition.x + 4 ) {
-				_isCameraEnableChasePlayer	= true;
-				_chasePlayer.SpeedRight		= _playerController.SpeedRight;
+			if ( ChaserCamera.transform.position.x - 4 <= _playerPosition.x ) {
 
-				DeadLineY.SetActive( true );
+				// 追跡するプレイヤーのX軸ポジション  が一定位置まで来た場合に追従開始.
+				if ( false == _isCameraEnableChasePlayer ) {
 
-				//  ロール Up & Down.
-				StartRollUpDown();
+					//  カメラのプレイヤー追跡処理.
+					_isCameraEnableChasePlayer	= true;
+					// カメラの追跡速度をプレイヤー速度に合わせる.
+					_chasePlayer.SpeedRight		= _playerController.SpeedRight;
+
+					// 左端デッドライン　プレイヤーがぶつかるとプレイヤー消滅.
+					DeadLineY.SetActive( true );
+					//  ロール Up & Down.
+					StartRollUpDown();
+
+					// プレイヤー操作可能.
+					_playerController.IsController	= true;
+				}
 			}
 		}
 	}
@@ -106,5 +115,14 @@ public class GameManager : MonoBehaviour {
 		_objBtnGameOver.transform.parent		= _Anchor.transform;
 		_objBtnGameOver.transform.localScale	= Vector3.one;
 		_objBtnGameOver.transform.localPosition	= Vector3.zero;
+	}
+
+	/// <summary>
+	/// Raises the GU event.
+	/// </summary>
+	void OnGUI( ) {
+		if ( Config.IS_DEBUG ) {
+			GUI.Box( new Rect(5, 5, 300, 100), string.Format( "_isCameraEnableChasePlayer : {0} \n", _isCameraEnableChasePlayer ) );
+		}
 	}
 }

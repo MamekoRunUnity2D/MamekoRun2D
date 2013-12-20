@@ -21,7 +21,7 @@ public class DestroyCollisionGameObject : MonoBehaviour {
 	void OnTriggerEnter2D( Collider2D coll ) {
 
 		if ( coll.gameObject.CompareTag( "Player" ) ) {
-			_playerController.isDead	= true;
+			_playerController.IsDead	= true;
 		}
 	}
 }
